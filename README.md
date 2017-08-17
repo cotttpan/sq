@@ -8,4 +8,4 @@ Sequential queue processor.
 yarn add @cotto/sq
 ```
 
-https://www.npmjs.com/package/@cotto/mobx-most
+https://www.npmjs.com/package/@cotto/sq

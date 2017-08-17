@@ -1,0 +1,57 @@
+{
+  "name": "@cotto/sq",
+  "description": "sequential queue processor",
+  "version": "0.0.1",
+  "author": "cotto",
+  "files": [
+    "es",
+    "dist",
+    "README.md",
+    "LICENCE"
+  ],
+  "main": "dist/index.js",
+  "jsnext:main": "es/index.js",
+  "module": "es/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotttpan/sq.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cotttpan/sq/issues"
+  },
+  "homepage": "https://github.com/cotttpan/sq",
+  "dependencies": {
+    "@types/node": "^8.0.23"
+  },
+  "devDependencies": {
+    "@cotto/tslint-config": "^0.0.5",
+    "@types/jest": "^20.0.7",
+    "@types/sinon": "^2.3.3",
+    "jest": "^20.0.4",
+    "npm-run-all": "^4.0.2",
+    "rimraf": "^2.6.1",
+    "sinon": "^3.2.0",
+    "ts-jest": "^20.0.10",
+    "tslint": "^5.6.0",
+    "typescript": "^2.4.2"
+  },
+  "keywords": [
+    "queue",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "npm-run-all build:*",
+    "build:dist": "tsc",
+    "build:es": "tsc --module es2015 --outDir ./es",
+    "clean": "run-p clean:**",
+    "clean:dist": "rimraf ./dist",
+    "clean:es": "rimraf ./es",
+    "lint": "tslint src/**/*.ts",
+    "start": "tsc -w",
+    "myprepublish": "run-s clean build",
+    "mypublish": "npm run myprepublish && npm publish --access=public",
+    "test": "NODE_ENV=test jest --watch"
+  }
+}

@@ -1,15 +1,4 @@
-import { compose, once, Processor, Next } from './index';
-
-describe('once', () => {
-    test('invoked only once', () => {
-        const mock = jest.fn((v: number) => v);
-        const wrapped = once(mock);
-
-        expect(wrapped(1)).toBe(1);
-        expect(wrapped(1)).toBe(undefined);
-        expect(mock).toHaveBeenCalledTimes(1);
-    });
-});
+import { compose, Processor, Next } from './index';
 
 describe('compose/Processor', () => {
     const f1 = (n: number, next: Next<number>) => setTimeout(() => next(n + 1), 100);

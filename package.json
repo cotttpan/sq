@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/cotttpan/sq",
   "dependencies": {
+    "@cotto/utils.ts": "^0.0.3",
     "@types/node": "^8.0.23"
   },
   "devDependencies": {

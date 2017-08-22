@@ -6,6 +6,12 @@
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@cotto/tslint-config/-/tslint-config-0.0.5.tgz#c2f40aa874c875c67c1bb3685d21a93f6d848a02"
 
+"@cotto/utils.ts@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@cotto/utils.ts/-/utils.ts-0.0.3.tgz#09843e5bab0f2b133fd9f8613f425efbf89c2fda"
+  dependencies:
+    "@types/node" "^8.0.24"
+
 "@types/jest@^20.0.7":
   version "20.0.7"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-20.0.7.tgz#39cd215db8bda03928dceb933a1e63eb2cbd210e"
@@ -13,6 +19,10 @@
 "@types/node@^8.0.23":
   version "8.0.23"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.23.tgz#c746697004782346594a0d755c34425bbf3014d2"
+
+"@types/node@^8.0.24":
+  version "8.0.24"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.24.tgz#06c580084d9add1fb40c1510ef0b448961246fb1"
 
 "@types/sinon@^2.3.3":
   version "2.3.3"

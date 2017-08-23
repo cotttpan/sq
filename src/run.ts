@@ -1,7 +1,7 @@
 import { Processor } from './processor';
 import { once } from '@cotto/utils.ts';
 
-export function run(this: Processor, input: any, done: (err: Error | undefined, output: any) => any, timeout = 5000) {
+export function run(this: Processor, input: any, context: any, done: (err: Error | undefined, output: any) => any, timeout = 5000) {
     let _tick: (v: any) => void;
     let index = -1;
     let tid: any;
@@ -39,7 +39,8 @@ export function run(this: Processor, input: any, done: (err: Error | undefined, 
             }
 
             if (!expired && typeof iresult.value === 'function') {
-                return iresult.value(v, once(tick));
+                const ctx = Object.assign({}, context, { next: once(tick) });
+                return iresult.value(v, ctx);
             }
         } catch (err) {
             end(err, undefined);

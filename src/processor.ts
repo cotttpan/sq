@@ -1,16 +1,21 @@
 import { run as _run } from './run';
+
 export interface Next<T> {
     (value: T | Error): any;
 }
 
-export interface Task<A, R> {
-    (a: A, next: Next<R>): any;
+export interface Context<T> {
+    next: Next<T>;
 }
 
-export class Processor<T = null, R = null> {
-    _tasks: Task<any, any>[] = [];
+export interface Task<A, R, C = {}> {
+    (a: A, context: Context<R> & C): any;
+}
 
-    constructor(...tasks: Task<any, any>[]) {
+export class Processor<T = null, R = null, C = {}> {
+    _tasks: Task<any, any, C>[] = [];
+
+    constructor(...tasks: Task<any, any, C>[]) {
         this._tasks = tasks;
     }
 
@@ -18,10 +23,10 @@ export class Processor<T = null, R = null> {
      * add new task with "mutable"
      *
      * @template U
-     * @param {Task<R, U>} task
-     * @returns {Processor<T, U>}
+     * @param {Task<R, U, C>} task
+     * @returns {Processor<T, U, C>}
      */
-    push<U>(task: Task<R, U>): Processor<T, U> {
+    push<U>(task: Task<R, U, C>): Processor<T, U, C> {
         this._tasks.push(task);
         return this as any;
     }
@@ -31,10 +36,10 @@ export class Processor<T = null, R = null> {
      *
      * @template U
      * @param {Task<R, U>} task
-     * @returns {Processor<T, U>}
+     * @returns {Processor<T, U, C>}
      */
-    concat<U>(task: Task<R, U>): Processor<T, U> {
-        return new Processor(...this._tasks, task);
+    concat<U>(task: Task<R, U>): Processor<T, U, C> {
+        return new Processor<T, U, C>(...this._tasks, task);
     }
 
     /**
@@ -45,8 +50,8 @@ export class Processor<T = null, R = null> {
      * @param {number} [timeout=5000]
      * @returns {void}
      */
-    run(input: T, done: (err: Error | undefined, output: R) => any, timeout = 5000) {
-        _run.call(this, input, done, timeout);
+    run(input: T, done: (err: Error | undefined, output: R) => any, context: C = {} as C, timeout = 5000) {
+        _run.call(this, input, context, done, timeout);
     }
 
     /**
@@ -56,14 +61,14 @@ export class Processor<T = null, R = null> {
      * @param {number} [timeout=5000]
      * @returns {Promise<R>}
      */
-    runAsync(input: T, timeout = 5000) {
+    runAsync(input: T, context?: C, timeout = 5000) {
         return new Promise<R>((resolve, reject) => {
             const done = (err: Error, result: any) => err ? reject(err) : resolve(result);
-            _run.call(this, input, done, timeout);
+            _run.call(this, input, context, done, timeout);
         });
     }
 
-    clone(): Processor<T, R> {
+    clone(): Processor<T, R, C> {
         return new Processor(...this._tasks);
     }
 }

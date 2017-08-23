@@ -1,4 +1,4 @@
-import { compose, Processor, Next } from './index';
+import { compose, Processor, Next, Task, parallel } from './index';
 
 describe('compose/Processor', () => {
     const f1 = (n: number, next: Next<number>) => setTimeout(() => next(n + 1), 100);
@@ -130,3 +130,39 @@ describe('compose/Processor', () => {
     });
 });
 
+
+describe('parallel', () => {
+    const t1: Task<number, number> = (v, next) => next(v);
+    const t2: Task<number, number> = (v, next) => setTimeout(() => next(v + 100), 100);
+    const t3: Task<number, number> = (v, next) => next(new Error());
+
+    it('return taks that bundled tasks', () => {
+        expect(typeof parallel(t1, t2)).toBe('function');
+    });
+
+    it('call next() with result that indexed at once after all bundled task is done', (done) => {
+        expect.assertions(2);
+        const task = parallel(t2, t1, t2);
+        const next = jest.fn();
+        task(1, next);
+
+        setTimeout(() => {
+            expect(next).toBeCalledWith([101, 1, 101]);
+            expect(next).toHaveBeenCalledTimes(1);
+            done();
+        }, 200);
+    });
+
+    test('compose queue with parallel', () => {
+        const task = parallel(t1, t2);
+        return compose(task).runAsync(1)
+            .then((r) => expect(r).toEqual([1, 101]));
+
+    });
+
+    test('with error', () => {
+        const task = parallel(t1, t2, t3);
+        return compose(task).runAsync(1)
+            .catch(err => expect(err).toBeInstanceOf(Error));
+    });
+});

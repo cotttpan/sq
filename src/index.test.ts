@@ -1,8 +1,11 @@
-import { compose, Processor, Next, Task, parallel } from './index';
+import { compose, Processor, Task, parallel } from './index';
+
+const CONTEXT = 'CONTEXT';
 
 describe('compose/Processor', () => {
-    const f1 = (n: number, next: Next<number>) => setTimeout(() => next(n + 1), 100);
-    const f2 = (n: number, next: Next<string>) => next(n.toString());
+    const context = { CONTEXT };
+    const f1: Task<number, number, typeof context> = (n, ctx) => setTimeout(() => ctx.next(n + 1), 100);
+    const f2: Task<number, string, typeof context> = (n, ctx) => ctx.next(n.toString());
 
     let queue = compose(f1, f2);
     beforeEach(() => queue = compose(f1, f2));
@@ -24,7 +27,9 @@ describe('compose/Processor', () => {
             const q1 = queue;
             expect(q1._tasks).toHaveLength(2);
 
-            const q2 = q1.push((s, next: Next<number>) => next(s.length));
+            const t3: Task<string, number> = (s, ctx) => ctx.next(s.length);
+
+            const q2 = q1.push<number>((s, ctx) => ctx.next(s.length));
             expect(q1._tasks).toHaveLength(3);
             expect(q2._tasks).toHaveLength(3);
 
@@ -38,7 +43,7 @@ describe('compose/Processor', () => {
             const q1 = queue;
             expect(q1._tasks).toHaveLength(2);
 
-            const q2 = q1.concat((s, next: Next<number>) => next(s.length));
+            const q2 = q1.concat<number>((s, { next }) => next(s.length));
             expect(q1._tasks).toHaveLength(2);
             expect(q2._tasks).toHaveLength(3);
 
@@ -58,18 +63,18 @@ describe('compose/Processor', () => {
 
         it('throw error when time expired', (done) => {
             // nextが呼び出されないtask
-            const f4 = (s: string, next: Next<string>) => s;
+            const f4: Task<string, string> = (s: string) => s;
             const q = queue.concat(f4);
 
             q.run(1, (err, result) => {
                 expect(err).toBeInstanceOf(Error);
                 expect(result).toBeUndefined();
                 done();
-            }, 200);
+            }, { CONTEXT }, 200);
         });
 
         it('is not invoked when next function called with Error', (done) => {
-            const errorFn = (v: any, next: Next<number>) => next(new Error('error'));
+            const errorFn: Task<any, number> = (v: any, { next }) => next(new Error('error'));
             const mock = jest.fn(f1) as typeof f1;
             const q = compose(errorFn, mock);
 
@@ -82,7 +87,7 @@ describe('compose/Processor', () => {
         });
 
         test('next function called once', (done) => {
-            const f = (v: number, next: Next<number>) => {
+            const f: Task<number, number> = (v, { next }) => {
                 next(v);
                 next(new Error());
                 Promise.resolve(v).then(next);
@@ -100,7 +105,7 @@ describe('compose/Processor', () => {
         });
 
         test('throw Error in task', (done) => {
-            const errFn = (v: any, next: Next<number>) => { throw new Error(); };
+            const errFn: Task<any, number> = (v: any, { next }) => { throw new Error(); };
             const mock = jest.fn(f1) as typeof f1;
             const q = compose(errFn, mock);
 
@@ -111,12 +116,23 @@ describe('compose/Processor', () => {
                 done();
             });
         });
+
+        test('run with context', (done) => {
+            const task: Task<string, string, typeof context> = (s, ctx) => {
+                expect(ctx.CONTEXT).toBe(CONTEXT);
+                ctx.next(ctx.CONTEXT);
+            };
+            queue.concat(task).run(1, (err, out) => {
+                expect(out).toBe(CONTEXT);
+                done();
+            }, context);
+        });
     });
 
 
     describe('Processor#runAsync', () => {
         it('return promise', () => {
-            return queue.runAsync(1).then(x => expect(x).toBe('2'));
+            return queue.runAsync(1, context).then(x => expect(x).toBe('2'));
         });
     });
 
@@ -132,9 +148,10 @@ describe('compose/Processor', () => {
 
 
 describe('parallel', () => {
-    const t1: Task<number, number> = (v, next) => next(v);
-    const t2: Task<number, number> = (v, next) => setTimeout(() => next(v + 100), 100);
-    const t3: Task<number, number> = (v, next) => next(new Error());
+    const context = { CONTEXT };
+    const t1: Task<number, number, typeof context> = (v, { next }) => next(v);
+    const t2: Task<number, number, typeof context> = (v, { next }) => setTimeout(() => next(v + 100), 100);
+    const t3: Task<number, number, typeof context> = (v, { next }) => next(new Error());
 
     it('return taks that bundled tasks', () => {
         expect(typeof parallel(t1, t2)).toBe('function');
@@ -144,7 +161,7 @@ describe('parallel', () => {
         expect.assertions(2);
         const task = parallel(t2, t1, t2);
         const next = jest.fn();
-        task(1, next);
+        task(1, { ...context, next });
 
         setTimeout(() => {
             expect(next).toBeCalledWith([101, 1, 101]);
@@ -158,6 +175,13 @@ describe('parallel', () => {
         return compose(task).runAsync(1)
             .then((r) => expect(r).toEqual([1, 101]));
 
+    });
+
+    test('run with context', () => {
+        const task: Task<number, string, typeof context> = (_, ctx) => ctx.next(ctx.CONTEXT);
+
+        return compose(parallel(t1, task, t2)).runAsync(1, context)
+            .then(r => expect(r).toEqual([1, CONTEXT, 101]));
     });
 
     test('with error', () => {

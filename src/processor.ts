@@ -1,4 +1,4 @@
-import { run as _run } from './run';
+import { execute } from './execute';
 
 export interface Next<T> {
     (value: T | Error | DOMException): any;
@@ -51,7 +51,7 @@ export class Processor<T = null, R = null, C = {}> {
      * @returns {void}
      */
     run(input: T, done: (err: Error | undefined, output: R) => any, context: C = {} as C, timeout = 5000) {
-        _run.call(this, input, context, done, timeout);
+        execute.call(this, input, context, done, timeout);
     }
 
     /**
@@ -64,7 +64,7 @@ export class Processor<T = null, R = null, C = {}> {
     runAsync(input: T, context?: C, timeout = 5000) {
         return new Promise<R>((resolve, reject) => {
             const done = (err: Error, result: any) => err ? reject(err) : resolve(result);
-            _run.call(this, input, context, done, timeout);
+            execute.call(this, input, context, done, timeout);
         });
     }
 

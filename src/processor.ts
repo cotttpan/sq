@@ -1,7 +1,7 @@
 import { run as _run } from './run';
 
 export interface Next<T> {
-    (value: T | Error): any;
+    (value: T | Error | DOMException): any;
 }
 
 export interface Context<T> {

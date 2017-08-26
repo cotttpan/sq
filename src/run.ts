@@ -28,6 +28,11 @@ export function run(this: Processor, input: any, context: any, done: (err: Error
                 throw v;
             }
 
+            if (DOMException && v instanceof DOMException) {
+                clearTimeout(tid);
+                throw v;
+            }
+
             if (expired) {
                 clearTimeout(tid);
                 throw new Error(`timeout of ${timeout}ms exceeded on task of queue[${index - 1}]`);

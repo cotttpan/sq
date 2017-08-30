@@ -1,7 +1,7 @@
 {
   "name": "@cotto/sq",
   "description": "sequential queue processor",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "cotto",
   "files": [
     "es",
@@ -50,8 +50,9 @@
     "clean:dist": "rimraf ./dist",
     "clean:es": "rimraf ./es",
     "lint": "tslint src/**/*.ts",
+    "typecheck": "tsc --noEmit",
     "start": "tsc -w",
-    "myprepublish": "run-s clean build",
+    "myprepublish": "run-s typecheck clean build",
     "mypublish": "npm run myprepublish && npm publish --access=public",
     "test": "NODE_ENV=test jest --watch"
   }

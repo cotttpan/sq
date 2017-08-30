@@ -9,7 +9,7 @@ export class QueueProcessor<I, O, C = {}> {
     }
 
     pipe<R>(task: Task<O, R, C>) {
-        return new QueueProcessor<I, any, C>([...this.queue, task]);
+        return new QueueProcessor<I, R, C>([...this.queue, task]);
     }
 
     run(input: I, done: Done<O>, context: C = {} as C, timeout = 5000) {

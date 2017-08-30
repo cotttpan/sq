@@ -1,12 +1,13 @@
-import { Processor } from './processor';
 import { once } from '@cotto/utils.ts';
+import { AnyQueue, Done } from './types';
+import { isErrorTarget } from './is-error-target';
 
-export function execute(this: Processor, input: any, context: any, done: (err: Error | undefined, output: any) => any, timeout = 5000) {
+export function execute<C = {}>(queue: AnyQueue<C>, input: any, context: C, done: Done<any>, timeout = 5000) {
     let _tick: (v: any) => void;
     let index = -1;
     let tid: any;
     let expired = false;
-    const iterable = [...this._tasks][Symbol.iterator]();
+    const iterable = [...queue][Symbol.iterator]();
     const end = once(done);
 
     const onTimeout = () => {
@@ -23,19 +24,14 @@ export function execute(this: Processor, input: any, context: any, done: (err: E
 
             const iresult = iterable.next();
 
-            if (v instanceof Error) {
-                clearTimeout(tid);
-                throw v;
-            }
-
-            if (DOMException && v instanceof DOMException) {
+            if (isErrorTarget(v)) {
                 clearTimeout(tid);
                 throw v;
             }
 
             if (expired) {
                 clearTimeout(tid);
-                throw new Error(`timeout of ${timeout}ms exceeded on task of queue[${index - 1}]`);
+                throw new Error(`timeout of ${timeout}ms exceeded on queue[${index - 1}]`);
             }
 
             if (iresult.done) {
@@ -44,7 +40,7 @@ export function execute(this: Processor, input: any, context: any, done: (err: E
             }
 
             if (!expired && typeof iresult.value === 'function') {
-                const ctx = Object.assign({}, context, { next: once(tick) });
+                const ctx = Object.assign({}, context, { next: once(tick), index });
                 return iresult.value(v, ctx);
             }
         } catch (err) {
@@ -52,3 +48,4 @@ export function execute(this: Processor, input: any, context: any, done: (err: E
         }
     }(input));
 }
+

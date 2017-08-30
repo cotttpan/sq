@@ -1,4 +1,5 @@
-import { Processor, Task } from './processor';
+import { QueueProcessor as Processor } from './processor';
+import { Task } from './types';
 
 export { compose };
 
@@ -58,5 +59,5 @@ function compose<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, R, C = {}>(
     f9: Task<A9, A10, C>,
     f10: Task<A10, R, C>): Processor<A1, R, C>;
 function compose(...tasks: Task<any, any>[]) {
-    return new Processor(...tasks);
+    return new Processor(tasks);
 }

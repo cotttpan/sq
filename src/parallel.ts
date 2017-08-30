@@ -1,5 +1,6 @@
-import { Task } from './processor';
-import { justOnTime, bundle } from '@cotto/utils.ts';
+import { Task } from './types';
+import { afterOnce, bundle } from '@cotto/utils.ts';
+import { isErrorTarget } from './is-error-target';
 
 export { parallel };
 function parallel<A, R1, R2, C = {}>(t1: Task<A, R1, C>, t2: Task<A, R2, C>): Task<A, [R1, R2], C>;
@@ -70,16 +71,16 @@ function parallel<A, C = {}>(task: Task<A, any, C>, ...tasks: Task<A, any, C>[])
 function parallel<A, C = {}>(...tasks: Task<A, any, C>[]): Task<A, any[], C> {
     return (value, context) => {
         const result: any[] = [];
-        const tick = justOnTime(tasks.length, done);
+        const expose = afterOnce(tasks.length, done);
 
         for (let i = 0; i < tasks.length; i++) {
-            const next = bundle((v: any) => result[i] = v, tick);
-            const ctx = Object.assign({}, context, { next });
+            const next = bundle((v: any) => result[i] = v, expose);
+            const ctx = Object.assign({}, context, { next, index: [context.index, i] });
             tasks[i].call(null, value, ctx);
         }
 
         function done() {
-            const err = result.find(r => r instanceof Error);
+            const err = result.find(isErrorTarget);
             err ? context.next(err) : context.next(result);
         }
     };

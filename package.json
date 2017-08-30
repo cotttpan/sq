@@ -1,7 +1,7 @@
 {
   "name": "@cotto/sq",
   "description": "sequential queue processor",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "cotto",
   "files": [
     "es",
@@ -23,19 +23,19 @@
   },
   "homepage": "https://github.com/cotttpan/sq",
   "dependencies": {
-    "@cotto/utils.ts": "^0.0.3",
-    "@types/node": "^8.0.23"
+    "@cotto/utils.ts": "^0.0.8",
+    "@types/node": "^8.0.26"
   },
   "devDependencies": {
-    "@cotto/tslint-config": "^0.0.5",
-    "@types/jest": "^20.0.7",
+    "@cotto/tslint-config": "^0.0.6",
+    "@types/jest": "^20.0.8",
     "@types/sinon": "^2.3.3",
     "jest": "^20.0.4",
-    "npm-run-all": "^4.0.2",
+    "npm-run-all": "^4.1.1",
     "rimraf": "^2.6.1",
-    "sinon": "^3.2.0",
-    "ts-jest": "^20.0.10",
-    "tslint": "^5.6.0",
+    "sinon": "^3.2.1",
+    "ts-jest": "^20.0.11",
+    "tslint": "^5.7.0",
     "typescript": "^2.4.2"
   },
   "keywords": [

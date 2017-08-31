@@ -75,7 +75,7 @@ function parallel(...tasks: Task<any, any>[]): Task<any, any[]> {
 
         for (let i = 0; i < tasks.length; i++) {
             const next = bundle((v: any) => result[i] = v, expose);
-            const ctx = Object.assign({}, context, { next, index: [context.index, i] });
+            const ctx = Object.assign({}, context, { next, index: context.index });
             tasks[i].call(null, value, ctx);
         }
 

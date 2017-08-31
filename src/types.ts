@@ -4,7 +4,7 @@ export interface Next<T> {
 
 export interface Context<T> {
     next: Next<T>;
-    index: number | number[];
+    index: number;
 }
 
 export interface Task<I, O, C = {}> {

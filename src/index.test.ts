@@ -164,7 +164,7 @@ describe('parallel', () => {
 
     test('run with context', () => {
         const task: Task<number, string, typeof context> = (_, ctx) => {
-            expect(ctx.index).toEqual([0, 1]);
+            expect(ctx.index).toBe(0);
             ctx.next(ctx.CONTEXT);
         };
 

@@ -21,22 +21,32 @@ describe('compose/Processor', () => {
         });
     });
 
-    describe('QueueProcessor#pipe', () => {
+    describe('#pipe', () => {
         const t3: Task<string, number> = (s, ctx) => ctx.next(s.length);
 
-        it('add task to queue', () => {
-            expect(processor.pipe(t3).queue).toHaveLength(3);
-        });
-
-        it('return new Processor for it treat self.queue with immutable)', () => {
-            const p2 = processor.pipe(t3);
-            expect(processor.queue).toHaveLength(2);
+        it('add task to queue with muttable', () => {
+            const p1 = processor;
+            const p2 = p1.pipe(t3);
+            expect(p1.queue).toHaveLength(3);
             expect(p2.queue).toHaveLength(3);
-            expect(processor).not.toBe(p2);
+            expect(p1).toBe(p2);
         });
     });
 
-    describe('Processor#run', () => {
+    describe('#clone', () => {
+        const t3: Task<any, any> = () => {/* noop */ };
+
+        it('return new Processor', () => {
+            const p1 = processor;
+            const p2 = p1.clone().pipe(t3);
+            expect(p1.queue).toHaveLength(2);
+            expect(p2.queue).toHaveLength(3);
+            expect(p1).not.toBe(p2);
+        });
+    });
+
+
+    describe('#run', () => {
         it('process tasks', (done) => {
             processor.run(1, (err, result) => {
                 expect(err).toBeUndefined();
@@ -49,7 +59,7 @@ describe('compose/Processor', () => {
             // nextが呼び出されないtask
             const t: Task<string, string> = (s: string) => s;
 
-            processor.pipe(t).run(1, (err, result) => {
+            processor.clone().pipe(t).run(1, (err, result) => {
                 expect(err).toBeInstanceOf(Error);
                 expect(result).toBeUndefined();
                 done();
@@ -106,7 +116,7 @@ describe('compose/Processor', () => {
                 expect(ctx.CONTEXT).toBe(CONTEXT);
                 ctx.next(ctx.CONTEXT);
             };
-            processor.pipe(task).run(1, (err, out) => {
+            processor.clone().pipe(task).run(1, (err, out) => {
                 expect(out).toBe(CONTEXT);
                 done();
             }, context);
@@ -114,7 +124,7 @@ describe('compose/Processor', () => {
     });
 
 
-    describe('Processor#runAsync', () => {
+    describe('#runAsync', () => {
         it('return promise', () => {
             return processor.runAsync(1, context).then(x => expect(x).toBe('2'));
         });

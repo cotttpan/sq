@@ -9,7 +9,8 @@ export class Processor<I, O, C = {}> {
     }
 
     pipe<R>(task: Task<O, R, C>) {
-        return new QueueProcessor<I, R, C>([...this.queue, task]);
+        this.queue.push(task);
+        return this as any as Processor<I, R, C>;
     }
 
     run(input: I, done: Done<O>, context: C = {} as C, timeout = 5000) {
@@ -21,5 +22,9 @@ export class Processor<I, O, C = {}> {
             const done: Done<O> = (err: any, result: any) => err ? reject(err) : resolve(result);
             return execute(this.queue, input, context, done, timeout);
         });
+    }
+
+    clone() {
+        return new Processor(...this.queue);
     }
 }

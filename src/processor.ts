@@ -1,7 +1,7 @@
 import { AnyQueue, Task, Done } from './types';
 import { execute } from './execute';
 
-export class QueueProcessor<I, O, C = {}> {
+export class Processor<I, O, C = {}> {
     queue: AnyQueue<C> = [];
 
     constructor(tasks: AnyQueue<C> = []) {

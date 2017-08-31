@@ -1,4 +1,4 @@
-import { compose, QueueProcessor as Processor, Task, parallel } from './index';
+import { compose, Processor, Task, parallel } from './index';
 
 const CONTEXT = 'CONTEXT';
 

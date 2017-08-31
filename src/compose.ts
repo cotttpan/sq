@@ -1,4 +1,4 @@
-import { QueueProcessor as Processor } from './processor';
+import { Processor } from './processor';
 import { Task } from './types';
 
 export { compose };

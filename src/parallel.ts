@@ -67,8 +67,8 @@ function parallel<A, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, C = {}>(
     t9: Task<A, R9, C>,
     t10: Task<A, R10, C>
 ): Task<A, [R1, R2, R3, R4, R5, R6, R7, R8, R9, R10], C>;
-function parallel<A, C = {}>(task: Task<A, any, C>, ...tasks: Task<A, any, C>[]): Task<A, any[], C>;
-function parallel<A, C = {}>(...tasks: Task<A, any, C>[]): Task<A, any[], C> {
+function parallel<A, C = {}>(...tasks: Task<A, any, C>[]): Task<A, any[], C>;
+function parallel(...tasks: Task<any, any>[]): Task<any, any[]> {
     return (value, context) => {
         const result: any[] = [];
         const expose = afterOnce(tasks.length, done);

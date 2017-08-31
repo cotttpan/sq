@@ -4,7 +4,7 @@ import { execute } from './execute';
 export class Processor<I, O, C = {}> {
     queue: AnyQueue<C> = [];
 
-    constructor(tasks: AnyQueue<C> = []) {
+    constructor(...tasks: AnyQueue<C>) {
         this.queue = tasks;
     }
 

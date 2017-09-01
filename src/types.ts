@@ -2,13 +2,15 @@ export interface Next<T> {
     (value: T | Error | DOMException): any;
 }
 
-export interface Context<T> {
+export interface MergedContext<T> {
     next: Next<T>;
     index: number;
 }
 
+export type Context<T, C> = MergedContext<T> & C;
+
 export interface Task<I, O, C = {}> {
-    (a: I, context: Context<O> & C): any;
+    (a: I, context: Context<O, C>): any;
 }
 
 export interface Done<T> {

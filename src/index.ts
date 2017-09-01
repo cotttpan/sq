@@ -1,4 +1,4 @@
 export { compose } from './compose';
 export { parallel } from './parallel';
 export { Processor } from './processor';
-export * from './types';
+export { Next, MergedContext, Context, Task, Done, AnyQueue } from './types';
